@@ -1,0 +1,15 @@
+{
+  "name": "storybook-dispatch-addon-examples",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:all": "pnpm install -r",
+    "storybook:local-reducer": "pnpm --filter @storybook-dispatch-examples/local-reducer run storybook",
+    "storybook:redux-toolkit": "pnpm --filter @storybook-dispatch-examples/redux-toolkit run storybook",
+    "storybook:all": "pnpm --parallel --stream --filter @storybook-dispatch-examples/local-reducer --filter @storybook-dispatch-examples/redux-toolkit run storybook",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

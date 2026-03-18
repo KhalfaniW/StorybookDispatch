@@ -1,0 +1,27 @@
+{
+  "name": "@storybook-dispatch-examples/redux-toolkit",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "storybook": "storybook dev -p 6007",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@reduxjs/toolkit": "^2.6.1",
+    "storybook-dispatch-addon": "file:../../storybook-dispatch-addon"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.12",
+    "@storybook/addon-interactions": "^8.6.12",
+    "@storybook/react": "^8.6.12",
+    "@storybook/react-vite": "^8.6.12",
+    "@vitejs/plugin-react": "^4.3.4",
+    "storybook": "^8.6.12",
+    "vite": "^5.4.11"
+  }
+}
