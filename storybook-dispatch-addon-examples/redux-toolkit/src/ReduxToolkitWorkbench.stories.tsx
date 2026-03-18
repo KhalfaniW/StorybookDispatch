@@ -1,15 +1,20 @@
-import { ReduxToolkitWorkbench } from "./ReduxToolkitWorkbench";
+import type { Meta, StoryObj } from "@storybook/react";
 import { createDispatchStory } from "storybook-dispatch-addon";
+import { ReduxToolkitWorkbench } from "./ReduxToolkitWorkbench";
 import {
   getReduxToolkitActionLabel,
   reduxToolkitInitialState,
   reduxToolkitSeedActions,
   toolkitReducer,
-} from "./reduxToolkitWorkbenchModel.js";
+} from "./reduxToolkitWorkbenchModel";
+import type { ReduxToolkitAction, ReduxToolkitWorkbenchState } from "./reduxToolkitWorkbenchModel";
 
 const seedActions = reduxToolkitSeedActions;
 
-const ReduxToolkitWorkbenchStory = createDispatchStory({
+const ReduxToolkitWorkbenchStory = createDispatchStory<
+  ReduxToolkitWorkbenchState,
+  ReduxToolkitAction
+>({
   reducer: toolkitReducer,
   initialState: reduxToolkitInitialState,
   seedActions,
@@ -25,8 +30,10 @@ const meta = {
   parameters: {
     layout: "fullscreen",
   },
-};
+} satisfies Meta<typeof ReduxToolkitWorkbenchStory>;
 
 export default meta;
 
-export const Default = {};
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};

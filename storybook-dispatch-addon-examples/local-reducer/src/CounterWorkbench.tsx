@@ -1,6 +1,13 @@
 import { useMemo } from "react";
+import type { DispatchTraceSession } from "storybook-dispatch-addon";
+import type { CounterWorkbenchAction, CounterWorkbenchState } from "./counterWorkbenchModel";
 
-export function CounterWorkbench({ state, dispatchAction }) {
+type CounterWorkbenchProps = Pick<
+  DispatchTraceSession<CounterWorkbenchState, CounterWorkbenchAction>,
+  "state" | "dispatchAction"
+>;
+
+export function CounterWorkbench({ state, dispatchAction }: CounterWorkbenchProps) {
   const quickStats = useMemo(
     () => [
       { label: "Count", value: state.count },

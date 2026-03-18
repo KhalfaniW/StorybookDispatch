@@ -37,7 +37,7 @@ The preview bridge publishes that state to Storybook. The addon panel then shows
 
 ## Example
 
-```jsx
+```tsx
 import { createDispatchStory } from "storybook-dispatch-addon";
 
 const seedActions = [
@@ -66,7 +66,7 @@ storybook-dispatch-addon
 
 Storybook preset:
 
-```js
+```ts
 addons: ["storybook-dispatch-addon/preset.js"];
 ```
 

@@ -1,12 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-function storyUrl(origin, path) {
+function storyUrl(origin: string, path: string) {
   return `${origin}/?path=${path}&addonPanel=dispatch-trace/panel`;
 }
 
-test("local reducer story supports dispatch and timeline navigation", async ({
-  page,
-}) => {
+test("local reducer story supports dispatch and timeline navigation", async ({ page }) => {
   await page.goto(
     storyUrl(
       "http://127.0.0.1:6006",
@@ -25,9 +23,7 @@ test("local reducer story supports dispatch and timeline navigation", async ({
 
   await page.getByRole("button", { name: "Dispatch action" }).click();
 
-  await expect(
-    page.getByRole("button", { name: /Step 6 increment/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /Step 6 increment/i })).toBeVisible();
   await expect(page.getByText('"count": 3')).toBeVisible();
 
   const preview = page.frameLocator("#storybook-preview-iframe");
@@ -41,9 +37,7 @@ test("local reducer story supports dispatch and timeline navigation", async ({
   await expect(page.getByText('"count": 3')).toBeVisible();
 });
 
-test("redux toolkit story accepts seeded toolkit actions from the addon", async ({
-  page,
-}) => {
+test("redux toolkit story accepts seeded toolkit actions from the addon", async ({ page }) => {
   await page.goto(
     storyUrl(
       "http://127.0.0.1:6007",
@@ -59,9 +53,7 @@ test("redux toolkit story accepts seeded toolkit actions from the addon", async 
   await page.getByRole("button", { name: /^orders\/markBusy\s+\{/ }).click();
   await page.getByRole("button", { name: "Dispatch action" }).click();
 
-  await expect(
-    page.getByRole("button", { name: /Step 7 orders\/markBusy/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /Step 7 orders\/markBusy/i })).toBeVisible();
   await expect(page.getByText('"status": "busy"')).toBeVisible();
 
   const preview = page.frameLocator("#storybook-preview-iframe");

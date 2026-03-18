@@ -13,10 +13,5 @@ export default function App() {
     getActionLabel: getReduxToolkitActionLabel,
   });
 
-  return (
-    <ReduxToolkitWorkbench
-      state={trace.state}
-      dispatchAction={trace.dispatchAction}
-    />
-  );
+  return <ReduxToolkitWorkbench state={trace.state} dispatchAction={trace.dispatchAction} />;
 }

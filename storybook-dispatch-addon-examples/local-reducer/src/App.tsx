@@ -13,10 +13,5 @@ export default function App() {
     getActionLabel: getCounterWorkbenchActionLabel,
   });
 
-  return (
-    <CounterWorkbench
-      state={trace.state}
-      dispatchAction={trace.dispatchAction}
-    />
-  );
+  return <CounterWorkbench state={trace.state} dispatchAction={trace.dispatchAction} />;
 }

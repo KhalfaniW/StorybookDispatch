@@ -1,7 +1,15 @@
 import { useEffect } from "react";
 import { WINDOW_COMMAND_EVENT, WINDOW_STATE_EVENT } from "./dispatchBridgeEvents";
+import type { DispatchActionBase, DispatchBridgeCommand, DispatchBridgeState } from "../types";
 
-export function useStorybookDispatchBridge({
+type UseStorybookDispatchBridgeOptions<TState, TAction extends DispatchActionBase> =
+  DispatchBridgeState<TState, TAction> & {
+    enabled: boolean;
+    dispatchAction: (action: TAction) => unknown;
+    goToStep: (index: number) => void;
+  };
+
+export function useStorybookDispatchBridge<TState, TAction extends DispatchActionBase>({
   enabled,
   state,
   timeline,
@@ -9,14 +17,16 @@ export function useStorybookDispatchBridge({
   seedActions,
   dispatchAction,
   goToStep,
-}) {
+}: UseStorybookDispatchBridgeOptions<TState, TAction>) {
   useEffect(() => {
     if (!enabled || typeof window === "undefined") {
       return undefined;
     }
 
-    const handleCommand = (event) => {
-      const command = event.detail;
+    const handleCommand = (
+      event: Event,
+    ) => {
+      const command = (event as CustomEvent<DispatchBridgeCommand<TAction>>).detail;
       if (!command || typeof command !== "object") {
         return;
       }
@@ -31,10 +41,10 @@ export function useStorybookDispatchBridge({
       }
     };
 
-    window.addEventListener(WINDOW_COMMAND_EVENT, handleCommand);
+    window.addEventListener(WINDOW_COMMAND_EVENT, handleCommand as EventListener);
 
     return () => {
-      window.removeEventListener(WINDOW_COMMAND_EVENT, handleCommand);
+      window.removeEventListener(WINDOW_COMMAND_EVENT, handleCommand as EventListener);
     };
   }, [dispatchAction, enabled, goToStep]);
 
@@ -44,7 +54,7 @@ export function useStorybookDispatchBridge({
     }
 
     window.dispatchEvent(
-      new CustomEvent(WINDOW_STATE_EVENT, {
+      new CustomEvent<DispatchBridgeState<TState, TAction>>(WINDOW_STATE_EVENT, {
         detail: { state, timeline, currentIndex, seedActions },
       }),
     );

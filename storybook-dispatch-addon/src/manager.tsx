@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { AddonPanel } from "@storybook/components";
 import { addons, types, useStorybookState } from "@storybook/manager-api";
 import {
@@ -6,13 +7,42 @@ import {
   DISPATCH_COMMAND,
   DISPATCH_PANEL_ID,
   DISPATCH_STATE_SYNC,
-} from "./storybook/dispatchBridgeEvents.js";
+} from "./storybook/dispatchBridgeEvents";
+import type { DispatchActionBase, DispatchBridgeCommand, DispatchTimelineEntry } from "./types";
 
-function formatJson(value) {
+type DispatchPanelProps = {
+  active: boolean;
+};
+
+type PanelStoreEntry = {
+  state: unknown;
+  timeline: DispatchTimelineEntry<unknown, DispatchActionBase>[];
+  currentIndex: number;
+  seedActions: DispatchActionBase[];
+};
+
+type PanelStore = Record<string, PanelStoreEntry>;
+
+type StateSyncPayload = {
+  storyId?: string;
+} & PanelStoreEntry;
+
+function isDispatchAction(value: unknown): value is DispatchActionBase {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    "type" in value &&
+    typeof value.type === "string" &&
+    value.type.length > 0
+  );
+}
+
+function formatJson(value: unknown) {
   return JSON.stringify(value, null, 2);
 }
 
-function formatTimestamp(value) {
+function formatTimestamp(value: unknown) {
   if (!value) {
     return "Ready";
   }
@@ -24,7 +54,7 @@ function formatTimestamp(value) {
   return String(value);
 }
 
-function DispatchPanel({ active }) {
+function DispatchPanel({ active }: DispatchPanelProps) {
   const { storyId } = useStorybookState();
   const [draft, setDraft] = useState(`{
   "type": "increment",
@@ -33,7 +63,7 @@ function DispatchPanel({ active }) {
   }
 }`);
   const [error, setError] = useState("");
-  const [store, setStore] = useState({});
+  const [store, setStore] = useState<PanelStore>({});
 
   useEffect(() => {
     const channel = addons.getChannel();
@@ -44,7 +74,11 @@ function DispatchPanel({ active }) {
       timeline,
       currentIndex,
       seedActions,
-    }) => {
+    }: StateSyncPayload) => {
+      if (!nextStoryId) {
+        return;
+      }
+
       setStore((current) => ({
         ...current,
         [nextStoryId]: {
@@ -63,39 +97,46 @@ function DispatchPanel({ active }) {
     };
   }, []);
 
-  const entry = store[storyId] ?? {
-    state: null,
-    timeline: [],
-    currentIndex: 0,
-    seedActions: [],
-  };
+  const entry: PanelStoreEntry = storyId
+    ? (store[storyId] ?? {
+        state: null,
+        timeline: [],
+        currentIndex: 0,
+        seedActions: [],
+      })
+    : {
+        state: null,
+        timeline: [],
+        currentIndex: 0,
+        seedActions: [],
+      };
   const timeline = entry.timeline;
   const selectedIndex = Math.max(0, Math.min(entry.currentIndex, Math.max(timeline.length - 1, 0)));
   const selectedStep = timeline[selectedIndex] ?? null;
   const templates = useMemo(() => entry.seedActions ?? [], [entry.seedActions]);
 
-  const sendCommand = (command) => {
+  const sendCommand = (command: DispatchBridgeCommand<DispatchActionBase>) => {
     addons.getChannel().emit(DISPATCH_COMMAND, { storyId, command });
   };
 
   const submitDraft = () => {
     try {
-      const action = JSON.parse(draft);
+      const action = JSON.parse(draft) as unknown;
       if (!action || typeof action !== "object" || Array.isArray(action)) {
         throw new Error("Action must be a JSON object.");
       }
-      if (typeof action.type !== "string" || !action.type) {
+      if (!isDispatchAction(action)) {
         throw new Error('Action requires a string "type".');
       }
 
       sendCommand({ kind: "dispatch", action });
       setError("");
     } catch (nextError) {
-      setError(nextError.message);
+      setError(nextError instanceof Error ? nextError.message : String(nextError));
     }
   };
 
-  const goToStep = (index) => {
+  const goToStep = (index: number) => {
     sendCommand({ kind: "gotoStep", index });
   };
 
@@ -421,12 +462,12 @@ const panelStyles = {
     color: "#f48771",
     fontSize: 13,
   },
-};
+} satisfies Record<string, CSSProperties>;
 
 addons.register(DISPATCH_ADDON_ID, () => {
   addons.add(DISPATCH_PANEL_ID, {
     title: "Dispatch Trace",
     type: types.PANEL,
-    render: ({ active, key }) => <DispatchPanel key={key} active={active} />,
+    render: (renderOptions) => <DispatchPanel active={Boolean(renderOptions?.active)} />,
   });
 });

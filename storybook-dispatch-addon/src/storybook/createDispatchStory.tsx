@@ -1,7 +1,13 @@
-import { useDispatchTraceSession } from "../dispatch-trace/useDispatchTraceSession.js";
-import { useStorybookDispatchBridge } from "./useStorybookDispatchBridge.js";
+import { useDispatchTraceSession } from "../dispatch-trace/useDispatchTraceSession";
+import { useStorybookDispatchBridge } from "./useStorybookDispatchBridge";
+import type { CreateDispatchStoryOptions, DispatchActionBase } from "../types";
 
-export function createDispatchStory({
+export function createDispatchStory<
+  TState,
+  TAction extends DispatchActionBase,
+  TArgs = unknown,
+  TContext = unknown,
+>({
   reducer,
   initialState,
   initAction,
@@ -9,8 +15,8 @@ export function createDispatchStory({
   getActionLabel,
   enabled = true,
   render,
-}) {
-  function DispatchStory(args, context) {
+}: CreateDispatchStoryOptions<TState, TAction, TArgs, TContext>) {
+  function DispatchStory(args: TArgs, context: TContext) {
     const trace = useDispatchTraceSession({
       reducer,
       initialState,

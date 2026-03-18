@@ -1,6 +1,13 @@
 import { useMemo } from "react";
+import type { DispatchTraceSession } from "storybook-dispatch-addon";
+import type { ReduxToolkitAction, ReduxToolkitWorkbenchState } from "./reduxToolkitWorkbenchModel";
 
-export function ReduxToolkitWorkbench({ state, dispatchAction }) {
+type ReduxToolkitWorkbenchProps = Pick<
+  DispatchTraceSession<ReduxToolkitWorkbenchState, ReduxToolkitAction>,
+  "state" | "dispatchAction"
+>;
+
+export function ReduxToolkitWorkbench({ state, dispatchAction }: ReduxToolkitWorkbenchProps) {
   const quickStats = useMemo(
     () => [
       { label: "Count", value: state.count },

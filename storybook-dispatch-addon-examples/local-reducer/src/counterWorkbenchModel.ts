@@ -1,4 +1,23 @@
-export const counterWorkbenchInitialState = {
+import type { DispatchLabelFormatter } from "storybook-dispatch-addon";
+
+export type CounterWorkbenchState = {
+  count: number;
+  step: number;
+  label: string;
+  items: string[];
+  lastUpdatedAt: string | null;
+};
+
+export type CounterWorkbenchAction =
+  | { type: "increment"; payload?: { amount?: number } }
+  | { type: "decrement"; payload?: { amount?: number } }
+  | { type: "setStep"; payload?: { step?: number } }
+  | { type: "rename"; payload?: { label?: string } }
+  | { type: "addItem"; payload?: { item?: string } }
+  | { type: "reset" }
+  | { type: "@@INIT" };
+
+export const counterWorkbenchInitialState: CounterWorkbenchState = {
   count: 2,
   step: 1,
   label: "Inventory",
@@ -6,7 +25,10 @@ export const counterWorkbenchInitialState = {
   lastUpdatedAt: null,
 };
 
-export function counterWorkbenchReducer(state, action) {
+export function counterWorkbenchReducer(
+  state: CounterWorkbenchState,
+  action: CounterWorkbenchAction,
+): CounterWorkbenchState {
   switch (action.type) {
     case "increment":
       return {
@@ -39,19 +61,23 @@ export function counterWorkbenchReducer(state, action) {
         lastUpdatedAt: new Date().toISOString(),
       };
     case "reset":
+    case "@@INIT":
       return {
         ...counterWorkbenchInitialState,
-        lastUpdatedAt: new Date().toISOString(),
+        lastUpdatedAt: action.type === "reset" ? new Date().toISOString() : state.lastUpdatedAt,
       };
     default:
-      throw new Error(`Unsupported action type: ${action.type}`);
+      return state;
   }
 }
 
-export function getCounterWorkbenchActionLabel(action, index) {
+export const getCounterWorkbenchActionLabel: DispatchLabelFormatter<CounterWorkbenchAction> = (
+  action,
+  index,
+) => {
   if (index === 0) {
     return "Initial";
   }
 
   return action.type;
-}
+};

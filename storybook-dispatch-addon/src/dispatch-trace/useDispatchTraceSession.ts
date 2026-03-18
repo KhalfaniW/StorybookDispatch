@@ -1,7 +1,33 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toSerializable } from "./serialization";
+import type {
+  DispatchActionBase,
+  DispatchLabelFormatter,
+  DispatchTimelineEntry,
+  DispatchTraceSession,
+} from "../types";
 
-function defaultLabelFormatter(action, index) {
+type SessionState<TState, TAction> = {
+  timeline: DispatchTimelineEntry<TState, TAction>[];
+  currentIndex: number;
+};
+
+type CreateInitialSessionOptions<TState, TAction> = {
+  reducer: (state: TState, action: TAction) => TState;
+  initialState: TState;
+  initAction: TAction;
+  getActionLabel: DispatchLabelFormatter<TAction>;
+  initialActions: TAction[];
+};
+
+type BuildNextSessionOptions<TState, TAction> = {
+  session: SessionState<TState, TAction>;
+  reducer: (state: TState, action: TAction) => TState;
+  action: TAction;
+  getActionLabel: DispatchLabelFormatter<TAction>;
+};
+
+function defaultLabelFormatter<TAction extends DispatchActionBase>(action: TAction, index: number) {
   if (index === 0) {
     return "Initial";
   }
@@ -9,7 +35,11 @@ function defaultLabelFormatter(action, index) {
   return action?.type ?? `Step ${index}`;
 }
 
-function createInitialTimeline(initialState, initAction, getActionLabel) {
+function createInitialTimeline<TState, TAction>(
+  initialState: TState,
+  initAction: TAction,
+  getActionLabel: DispatchLabelFormatter<TAction>,
+): DispatchTimelineEntry<TState, TAction>[] {
   return [
     {
       id: "step-0",
@@ -21,14 +51,14 @@ function createInitialTimeline(initialState, initAction, getActionLabel) {
   ];
 }
 
-function createInitialSession({
+function createInitialSession<TState, TAction>({
   reducer,
   initialState,
   initAction,
   getActionLabel,
   initialActions,
-}) {
-  let session = {
+}: CreateInitialSessionOptions<TState, TAction>): SessionState<TState, TAction> {
+  let session: SessionState<TState, TAction> = {
     timeline: createInitialTimeline(initialState, initAction, getActionLabel),
     currentIndex: 0,
   };
@@ -45,12 +75,12 @@ function createInitialSession({
   return session;
 }
 
-function buildNextSession({
+function buildNextSession<TState, TAction>({
   session,
   reducer,
   action,
   getActionLabel,
-}) {
+}: BuildNextSessionOptions<TState, TAction>): SessionState<TState, TAction> {
   const timestamp = new Date().toISOString();
   const baseState = session.timeline[session.currentIndex].state;
   const nextState = reducer(baseState, action);
@@ -71,13 +101,21 @@ function buildNextSession({
   };
 }
 
-export function useDispatchTraceSession({
+type UseDispatchTraceSessionOptions<TState, TAction extends DispatchActionBase> = {
+  reducer: (state: TState, action: TAction) => TState;
+  initialState: TState;
+  initAction?: TAction;
+  initialActions?: TAction[];
+  getActionLabel?: DispatchLabelFormatter<TAction>;
+};
+
+export function useDispatchTraceSession<TState, TAction extends DispatchActionBase>({
   reducer,
   initialState,
-  initAction = { type: "@@INIT" },
+  initAction = { type: "@@INIT" } as TAction,
   initialActions = [],
   getActionLabel = defaultLabelFormatter,
-}) {
+}: UseDispatchTraceSessionOptions<TState, TAction>): DispatchTraceSession<TState, TAction> {
   const initialSessionKey = JSON.stringify({
     initialState: toSerializable(initialState),
     initAction: toSerializable(initAction),
@@ -117,7 +155,7 @@ export function useDispatchTraceSession({
   const state = session.timeline[session.currentIndex].state;
   const history = useMemo(() => session.timeline.slice(1).reverse(), [session.timeline]);
 
-  const dispatchAction = (action) => {
+  const dispatchAction = (action: TAction) => {
     try {
       const nextSession = buildNextSession({
         session: sessionRef.current,
@@ -127,13 +165,13 @@ export function useDispatchTraceSession({
       });
       sessionRef.current = nextSession;
       setSession(nextSession);
-      return { ok: true };
+      return { ok: true } as const;
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error } as const;
     }
   };
 
-  const goToStep = (index) => {
+  const goToStep = (index: number) => {
     const nextIndex = Math.max(0, Math.min(index, sessionRef.current.timeline.length - 1));
     const nextSession = {
       ...sessionRef.current,
