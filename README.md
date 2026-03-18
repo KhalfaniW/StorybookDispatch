@@ -22,6 +22,7 @@ Stories opt in by using the provided hooks:
 
 - `useDispatchTraceSession`
 - `useStorybookDispatchBridge`
+- `createDispatchStory`
 
 ## How It Works
 
@@ -37,38 +38,22 @@ The preview bridge publishes that state to Storybook. The addon panel then shows
 ## Example
 
 ```jsx
-import {
-  useDispatchTraceSession,
-  useStorybookDispatchBridge,
-} from "storybook-dispatch-addon";
+import { createDispatchStory } from "storybook-dispatch-addon";
 
 const seedActions = [
   { type: "increment", payload: { amount: 3 } },
   { type: "setStep", payload: { step: 4 } },
 ];
 
-function ExampleStory() {
-  const trace = useDispatchTraceSession({
-    reducer,
-    initialState,
-    initialActions: seedActions,
-    getActionLabel,
-  });
-
-  useStorybookDispatchBridge({
-    enabled: true,
-    state: trace.state,
-    timeline: trace.timeline,
-    currentIndex: trace.currentIndex,
-    seedActions,
-    dispatchAction: trace.dispatchAction,
-    goToStep: trace.goToStep,
-  });
-
-  return (
-    <ExampleApp state={trace.state} dispatchAction={trace.dispatchAction} />
-  );
-}
+const ExampleStory = createDispatchStory({
+  reducer,
+  initialState,
+  seedActions,
+  getActionLabel,
+  render: ({ state, dispatchAction }) => (
+    <ExampleApp state={state} dispatchAction={dispatchAction} />
+  ),
+});
 ```
 
 ## Installation

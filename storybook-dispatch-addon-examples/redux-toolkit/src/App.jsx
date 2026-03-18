@@ -17,8 +17,6 @@ export default function App() {
     <ReduxToolkitWorkbench
       state={trace.state}
       dispatchAction={trace.dispatchAction}
-      timeline={trace.timeline}
-      currentIndex={trace.currentIndex}
     />
   );
 }

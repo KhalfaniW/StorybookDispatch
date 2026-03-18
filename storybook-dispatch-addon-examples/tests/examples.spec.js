@@ -36,7 +36,6 @@ test("local reducer story supports dispatch and timeline navigation", async ({
 
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await expect(page.getByText('"count": 2')).toBeVisible();
-  await expect(preview.getByText("Viewing step 5 of 6")).toBeVisible();
 
   await page.getByRole("button", { name: "Forward", exact: true }).click();
   await expect(page.getByText('"count": 3')).toBeVisible();

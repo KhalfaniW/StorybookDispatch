@@ -1,11 +1,6 @@
 import { useMemo } from "react";
 
-export function CounterWorkbench({
-  state,
-  dispatchAction,
-  timeline,
-  currentIndex,
-}) {
+export function CounterWorkbench({ state, dispatchAction }) {
   const quickStats = useMemo(
     () => [
       { label: "Count", value: state.count },
@@ -48,12 +43,6 @@ export function CounterWorkbench({
             Add item
           </button>
         </div>
-
-        {currentIndex < timeline.length - 1 ? (
-          <div className="timeline-badge">
-            Viewing step {currentIndex} of {timeline.length - 1}
-          </div>
-        ) : null}
 
         <div className="surface-panel">
           <div className="surface-panel-header">

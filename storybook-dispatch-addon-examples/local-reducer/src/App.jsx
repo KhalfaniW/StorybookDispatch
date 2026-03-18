@@ -17,8 +17,6 @@ export default function App() {
     <CounterWorkbench
       state={trace.state}
       dispatchAction={trace.dispatchAction}
-      timeline={trace.timeline}
-      currentIndex={trace.currentIndex}
     />
   );
 }

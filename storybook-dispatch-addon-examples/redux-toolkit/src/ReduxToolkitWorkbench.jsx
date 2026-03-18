@@ -1,11 +1,6 @@
 import { useMemo } from "react";
 
-export function ReduxToolkitWorkbench({
-  state,
-  dispatchAction,
-  timeline,
-  currentIndex,
-}) {
+export function ReduxToolkitWorkbench({ state, dispatchAction }) {
   const quickStats = useMemo(
     () => [
       { label: "Count", value: state.count },
@@ -40,12 +35,6 @@ export function ReduxToolkitWorkbench({
           <button onClick={() => dispatchAction({ type: "orders/increment" })}>+ Step</button>
           <button onClick={() => dispatchAction({ type: "orders/markBusy" })}>Mark busy</button>
         </div>
-
-        {currentIndex < timeline.length - 1 ? (
-          <div className="timeline-badge">
-            Viewing step {currentIndex} of {timeline.length - 1}
-          </div>
-        ) : null}
 
         <div className="surface-panel">
           <div className="surface-panel-header">
