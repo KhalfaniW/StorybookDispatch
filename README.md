@@ -37,9 +37,17 @@ The preview bridge publishes that state to Storybook. The addon panel then shows
 ## Example
 
 ```jsx
-import { useDispatchTraceSession, useStorybookDispatchBridge } from "storybook-dispatch-addon";
+import {
+  useDispatchTraceSession,
+  useStorybookDispatchBridge,
+} from "storybook-dispatch-addon";
 
-function ExampleStory({ seedActions }) {
+const seedActions = [
+  { type: "increment", payload: { amount: 3 } },
+  { type: "setStep", payload: { step: 4 } },
+];
+
+function ExampleStory() {
   const trace = useDispatchTraceSession({
     reducer,
     initialState,
@@ -57,7 +65,9 @@ function ExampleStory({ seedActions }) {
     goToStep: trace.goToStep,
   });
 
-  return <ExampleApp state={trace.state} dispatchAction={trace.dispatchAction} />;
+  return (
+    <ExampleApp state={trace.state} dispatchAction={trace.dispatchAction} />
+  );
 }
 ```
 
@@ -72,7 +82,7 @@ storybook-dispatch-addon
 Storybook preset:
 
 ```js
-addons: ["storybook-dispatch-addon/preset.js"]
+addons: ["storybook-dispatch-addon/preset.js"];
 ```
 
 The addon is currently developed in this repository under:
@@ -83,17 +93,17 @@ The addon is currently developed in this repository under:
 
 - [storybook-dispatch-addon](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon): addon source
 - [storybook-dispatch-addon-examples](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon-examples): example workspace
-- [storybook-dispatch-addon-examples/local-reducer](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon-examples/local-reducer): local reducer example
-- [storybook-dispatch-addon-examples/redux-toolkit](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon-examples/redux-toolkit): Redux Toolkit example
+  - [storybook-dispatch-addon-examples/local-reducer](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon-examples/local-reducer): local reducer example
+  - [storybook-dispatch-addon-examples/redux-toolkit](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon-examples/redux-toolkit): Redux Toolkit example
 
 ## Local Development
 
 From [storybook-dispatch-addon-examples](/home/khalfani/Projects/StorybookDispatch/storybook-dispatch-addon-examples):
 
 ```bash
-npx pnpm install
-npx pnpm run storybook:local-reducer
-npx pnpm run storybook:redux-toolkit
-npx pnpm run storybook:all
-npx pnpm test:e2e
+pnpm install
+pnpm run storybook:local-reducer
+pnpm run storybook:redux-toolkit
+pnpm run storybook:all
+pnpm test:e2e
 ```

@@ -9,18 +9,20 @@ import {
   toolkitReducer,
 } from "./reduxToolkitWorkbenchModel.js";
 
-function ReduxToolkitWorkbenchStory({ seedActions: storySeedActions }) {
+const seedActions = reduxToolkitSeedActions;
+
+function ReduxToolkitWorkbenchStory() {
   const trace = useDispatchTraceSession({
     reducer: toolkitReducer,
     initialState: reduxToolkitInitialState,
-    initialActions: storySeedActions,
+    initialActions: seedActions,
     getActionLabel: getReduxToolkitActionLabel,
   });
-  const seededActionsKey = JSON.stringify(storySeedActions ?? []);
+  const seededActionsKey = JSON.stringify(seedActions);
   const appliedSeedKeyRef = useRef(null);
 
   useEffect(() => {
-    if (!storySeedActions?.length) {
+    if (!seedActions.length) {
       return;
     }
 
@@ -33,19 +35,19 @@ function ReduxToolkitWorkbenchStory({ seedActions: storySeedActions }) {
       return;
     }
 
-    for (const action of storySeedActions) {
+    for (const action of seedActions) {
       trace.dispatchAction(action);
     }
 
     appliedSeedKeyRef.current = seededActionsKey;
-  }, [seededActionsKey, storySeedActions, trace]);
+  }, [seededActionsKey, trace]);
 
   useStorybookDispatchBridge({
     enabled: true,
     state: trace.state,
     timeline: trace.timeline,
     currentIndex: trace.currentIndex,
-    seedActions: storySeedActions,
+    seedActions,
     dispatchAction: trace.dispatchAction,
     goToStep: trace.goToStep,
   });
@@ -71,7 +73,4 @@ const meta = {
 export default meta;
 
 export const Default = {
-  args: {
-    seedActions: reduxToolkitSeedActions,
-  },
 };

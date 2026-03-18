@@ -16,18 +16,18 @@ const seedActions = [
   { type: "reset" },
 ];
 
-function CounterWorkbenchStory({ seedActions: storySeedActions }) {
+function CounterWorkbenchStory() {
   const trace = useDispatchTraceSession({
     reducer: counterWorkbenchReducer,
     initialState: counterWorkbenchInitialState,
-    initialActions: storySeedActions,
+    initialActions: seedActions,
     getActionLabel: getCounterWorkbenchActionLabel,
   });
-  const seededActionsKey = JSON.stringify(storySeedActions ?? []);
+  const seededActionsKey = JSON.stringify(seedActions);
   const appliedSeedKeyRef = useRef(null);
 
   useEffect(() => {
-    if (!storySeedActions?.length) {
+    if (!seedActions.length) {
       return;
     }
 
@@ -40,19 +40,19 @@ function CounterWorkbenchStory({ seedActions: storySeedActions }) {
       return;
     }
 
-    for (const action of storySeedActions) {
+    for (const action of seedActions) {
       trace.dispatchAction(action);
     }
 
     appliedSeedKeyRef.current = seededActionsKey;
-  }, [seededActionsKey, storySeedActions, trace]);
+  }, [seededActionsKey, trace]);
 
   useStorybookDispatchBridge({
     enabled: true,
     state: trace.state,
     timeline: trace.timeline,
     currentIndex: trace.currentIndex,
-    seedActions: storySeedActions,
+    seedActions,
     dispatchAction: trace.dispatchAction,
     goToStep: trace.goToStep,
   });
@@ -78,7 +78,4 @@ const meta = {
 export default meta;
 
 export const Default = {
-  args: {
-    seedActions,
-  },
 };
